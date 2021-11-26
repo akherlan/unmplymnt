@@ -1,0 +1,20 @@
+Package: unmplymnt
+Type: Package
+Title: Looking for Job Opportunity
+Version: 0.0.1
+Author: Andi Herlan
+Maintainer: Andi Herlan <andi.herlan@protonmail.com>
+Description: The internet must be a place for everyone unless you have no
+    money for just pay a bill for little bit of request-response data.
+    You must have a job.
+License: MIT
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.2
+Imports:
+    httr,
+    jsonlite,
+    tidyr,
+    janitor
+Depends:
+    dplyr
