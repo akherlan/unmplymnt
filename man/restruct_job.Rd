@@ -7,10 +7,10 @@
 restruct_job(jobls)
 }
 \arguments{
-\item{jobls}{List of job result from GQL}
+\item{jobls}{List of job result from gql() function}
 }
 \value{
-A tibble of job
+A data.frame of job in tibble format
 }
 \description{
 Restructuring List to Dataframe

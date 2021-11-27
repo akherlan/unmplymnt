@@ -14,7 +14,8 @@ RoxygenNote: 7.1.2
 Imports:
     httr,
     jsonlite,
+    dplyr,
     tidyr,
-    janitor
-Depends:
-    dplyr
+    janitor,
+    stringr,
+    rvest

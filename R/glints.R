@@ -1,16 +1,23 @@
-#' Get Vacancy from Glints
+#' Glints Vacancy
 #'
-#' @param jobid Job's id
-#' @param lim Limit number of job result
+#' @description Get job vacancy from Glints' website
+#' @param jobid Defined job's category ID. See glints_jobid() function.
+#' @param limit Limit amount of job result
 #'
 #' @return Job vacancy data.frame in tibble format
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' glints(2, 15)
+#' glints(2, 15) # return data science job
 #' }
-glints <- function(jobid = 2, lim = 30) {
+glints <- function(jobid, limit = 30) {
+
+  if (missing(jobid)) {
+    message('Argument "jobid" is missing, using default: 2')
+    jobid <- 2
+  }
+
   url <- "https://glints.com/api/graphql"
   opnam <- "searchJobs"
   var <- sprintf('{
@@ -23,7 +30,7 @@ glints <- function(jobid = 2, lim = 30) {
       "includeExternalJobs": true,
       "variant": "A"
     }
-  }', jobid, lim)
+  }', jobid, limit)
 
   query <- 'query searchJobs($data: JobSearchConditionInput!) {
       searchJobs(data: $data) {
@@ -33,7 +40,6 @@ glints <- function(jobid = 2, lim = 30) {
           isRemote
           status
           createdAt
-          isHot
           salaryEstimate {
             minAmount
             maxAmount
@@ -70,13 +76,8 @@ glints <- function(jobid = 2, lim = 30) {
       }
     }'
 
-  jobs <- gql(
-    query = query,
-    .variables = var,
-    .operationName = opnam,
-    .url = url
-  )
-
+  jobs <- gql(query = query, .variables = var,
+              .operationName = opnam, .url = url)
   jobs <- jobs$searchJobs$jobsInPage
   vacancy <- restruct_job(jobs)
   return(vacancy)

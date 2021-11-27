@@ -1,12 +1,12 @@
 #' Restructuring List to Dataframe
 #'
-#' @param jobls List of job result from GQL
+#' @param jobls List of job result from gql() function
 #'
-#' @return A tibble of job
+#' @return A data.frame of job in tibble format
 #' @export
 #' @import dplyr
 #' @importFrom tidyr pivot_wider
-#' @importFrom janitor clean_names
+#' @importFrom janitor clean_names convert_to_datetime
 #'
 restruct_job <- function(jobls){
 
@@ -36,37 +36,42 @@ restruct_job <- function(jobls){
     clean_names()
 
   # arrange
-  if (nchar(vacancy$id[1]) == 7) {
+  if (nchar(vacancy$id[1]) == 7) { # jobstreet
 
-    # jobstreet
     vacancy <- vacancy %>%
-      mutate(
-        job_url = paste0("https://www.jobstreet.co.id/id/job/", id)
-      ) %>%
+      mutate(job_url = paste0("https://www.jobstreet.co.id/id/job/", id),
+             source = "Jobstreet") %>%
       select(
-        id, matches("job"), posted_at, matches("categories"),
+        id, matches("job"), posted_at, source, matches("categories"),
         matches("company"), matches("employ"), matches("is_"),
         matches("location"), matches("country"),
         matches("salary"), matches("selling")
       ) %>%
       filter(source_country_code == "id") %>%
       mutate(source = "Jobstreet")
+    vacancy$posted_at <- convert_to_datetime(vacancy$posted_at)
+    attributes(vacancy$posted_at)$tzone <- Sys.timezone()
 
   }
 
-  else {
+  else if (nchar(vacancy$id[1]) == 36) { # glints
 
-    # glints
     vacancy <- vacancy %>%
+      mutate(job_url = paste0("https://glints.com/id/opportunities/jobs/", id),
+             source = "Glints") %>%
       select(
-        id, title, matches("category"), matches("city"),
-        country_name, applicant_count, matches("company"),
+        id, title, job_url, created_at, source, matches("category"),
+        matches("city"), country_name, applicant_count, matches("company"),
         matches("experience"), matches("salaries"), matches("salary_estimate"),
-        status, is_remote, is_hot, created_at
-      ) %>%
-      mutate(source = "Glints")
+        status, is_remote
+      )
+    vacancy <- rename(vacancy, "job_title" = "title", "posted_at" = "created_at")
+    vacancy$posted_at <- convert_to_datetime(vacancy$posted_at)
+    attributes(vacancy$posted_at)$tzone <- Sys.timezone()
 
-    vacancy <- rename(vacancy, "job_title" = "title")
+  } else {
+
+    message("Something wrong")
 
   }
 

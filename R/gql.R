@@ -1,16 +1,18 @@
-#' GraphQL Request
+#' Request GraphQL Query
 #'
+#' @description Request data using GraphQL query
 #' @param query GraphQL query
-#' @param ... Others
+#' @param ... Other arguments used by httr::POST()
 #' @param .token Token
 #' @param .variables Variables
 #' @param .operationName Operation name
-#' @param .url URL to RestAPI service base to endpoint
+#' @param .url Complete URL to RestAPI service base to endpoint
 #'
 #' @return List of query result
 #' @export
 #' @import httr
 #' @import jsonlite
+#'
 gql <- function(query,
                 ...,
                 .token = NULL,

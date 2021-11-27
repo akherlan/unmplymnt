@@ -1,5 +1,6 @@
-#' Get Vacancy from Jobstreet
+#' Jobstreet Vacancy
 #'
+#' @description Get job vacancy from Jobstreet's website
 #' @param key Keyword for searching
 #' @param page Pages to be looking at
 #'
@@ -8,9 +9,13 @@
 #'
 #' @examples
 #' \dontrun{
-#' jobstreet("data analyst", 1)
+#' jobstreet("data analyst") # return search result for data analyst
 #' }
-jobstreet <- function(key = "data analyst", page = 1){
+jobstreet <- function(key, page = 1){
+  if (missing(key)) {
+    message('Argument "key" is missing, using default: "data analyst"')
+    key <- "data analyst"
+  }
   url <- "https://xapi.supercharge-srp.co/job-search/graphql?country=id&isSmartSearch=true"
   var <- sprintf('{
     "keyword": "%s",
@@ -88,12 +93,7 @@ jobstreet <- function(key = "data analyst", page = 1){
     }
   }'
 
-  jobs <- gql(
-    query = query,
-    .variables = var,
-    .url = url
-  )
-
+  jobs <- gql(query = query, .variables = var, .url = url)
   jobs <- jobs$jobs$jobs
   vacancy <- restruct_job(jobs)
   return(vacancy)

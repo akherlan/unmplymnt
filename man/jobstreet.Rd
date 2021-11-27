@@ -2,9 +2,9 @@
 % Please edit documentation in R/jobstreet.R
 \name{jobstreet}
 \alias{jobstreet}
-\title{Get Vacancy from Jobstreet}
+\title{Jobstreet Vacancy}
 \usage{
-jobstreet(key = "data analyst", page = 1)
+jobstreet(key, page = 1)
 }
 \arguments{
 \item{key}{Keyword for searching}
@@ -15,10 +15,10 @@ jobstreet(key = "data analyst", page = 1)
 Job opportunity data.frame in tibble format
 }
 \description{
-Get Vacancy from Jobstreet
+Get job vacancy from Jobstreet's website
 }
 \examples{
 \dontrun{
-jobstreet("data analyst", 1)
+jobstreet("data analyst") # return search result for data analyst
 }
 }

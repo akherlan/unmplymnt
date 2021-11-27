@@ -2,23 +2,23 @@
 % Please edit documentation in R/glints.R
 \name{glints}
 \alias{glints}
-\title{Get Vacancy from Glints}
+\title{Glints Vacancy}
 \usage{
-glints(jobid = 2, lim = 30)
+glints(jobid, limit = 30)
 }
 \arguments{
-\item{jobid}{Job's id}
+\item{jobid}{Defined job's category ID. See glints_jobid() function.}
 
-\item{lim}{Limit number of job result}
+\item{limit}{Limit amount of job result}
 }
 \value{
 Job vacancy data.frame in tibble format
 }
 \description{
-Get Vacancy from Glints
+Get job vacancy from Glints' website
 }
 \examples{
 \dontrun{
-glints(2, 15)
+glints(2, 15) # return data science job
 }
 }

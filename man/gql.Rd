@@ -2,7 +2,7 @@
 % Please edit documentation in R/gql.R
 \name{gql}
 \alias{gql}
-\title{GraphQL Request}
+\title{Request GraphQL Query}
 \usage{
 gql(
   query,
@@ -16,7 +16,7 @@ gql(
 \arguments{
 \item{query}{GraphQL query}
 
-\item{...}{Others}
+\item{...}{Other arguments used by httr::POST()}
 
 \item{.token}{Token}
 
@@ -24,11 +24,11 @@ gql(
 
 \item{.operationName}{Operation name}
 
-\item{.url}{URL to RestAPI service base to endpoint}
+\item{.url}{Complete URL to RestAPI service base to endpoint}
 }
 \value{
 List of query result
 }
 \description{
-GraphQL Request
+Request data using GraphQL query
 }
