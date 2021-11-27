@@ -41,7 +41,7 @@ indeed <- function(key, page = 2) {
       html_children()
 
     # job url for full page direction and the id
-    job_url <- item[str_detect(item, "a\\sid")] |> html_attr("href")
+    job_url <- suppressWarnings(item[str_detect(item, "a\\sid")] |> html_attr("href"))
     job_url <- str_extract(job_url, "\\?jk=[a-z0-9]{16}")
     job_id <- str_remove(job_url, "\\?jk=")
     job_url <- paste0("https://id.indeed.com/lihat-lowongan-kerja", job_url)

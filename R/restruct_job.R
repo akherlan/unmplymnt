@@ -42,7 +42,7 @@ restruct_job <- function(jobls){
       mutate(job_url = paste0("https://www.jobstreet.co.id/id/job/", id),
              source = "Jobstreet") %>%
       select(
-        id, matches("job"), posted_at, source, matches("categories"),
+        "id", matches("job"), "posted_at", "source", matches("categories"),
         matches("company"), matches("employ"), matches("is_"),
         matches("location"), matches("country"),
         matches("salary"), matches("selling")
@@ -60,10 +60,10 @@ restruct_job <- function(jobls){
       mutate(job_url = paste0("https://glints.com/id/opportunities/jobs/", id),
              source = "Glints") %>%
       select(
-        id, title, job_url, created_at, source, matches("category"),
-        matches("city"), country_name, applicant_count, matches("company"),
+        "id", "title", "job_url", "created_at", "source", matches("category"),
+        matches("city"), "country_name", "applicant_count", matches("company"),
         matches("experience"), matches("salaries"), matches("salary_estimate"),
-        status, is_remote
+        "status", "is_remote"
       )
     vacancy <- rename(vacancy, "job_title" = "title", "posted_at" = "created_at")
     vacancy$posted_at <- convert_to_datetime(vacancy$posted_at)

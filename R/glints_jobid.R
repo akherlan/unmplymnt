@@ -11,9 +11,9 @@ glints_jobid <- function() {
 
   category <- fromJSON("https://glints.com/api/jobCategories")
   category <- category$data %>%
-    select(id, name, descriptionMarkdown) %>%
+    select("id", "name", "descriptionMarkdown") %>%
     as_tibble() %>%
-    arrange(id) %>%
+    arrange("id") %>%
     clean_names()
   return(category)
 
