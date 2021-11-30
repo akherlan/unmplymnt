@@ -42,9 +42,21 @@ indeed <- function(key, page = 2) {
 
     # job url for full page direction and the id
     job_url <- suppressWarnings(item[str_detect(item, "a\\sid")] |> html_attr("href"))
-    job_url <- str_extract(job_url, "\\?jk=[a-z0-9]{16}")
-    job_id <- str_remove(job_url, "\\?jk=")
-    job_url <- paste0("https://id.indeed.com/lihat-lowongan-kerja", job_url)
+    for (item in seq_along(job_url)) {
+      if (str_detect(job_url[item], "\\/rc\\/clk\\?jk")) {
+        job_url[item] <- str_extract(job_url[item], "\\?jk=[a-z0-9]{16}")
+      } else {
+        job_url[item] <- str_replace(job_url[item], "^(.+)\\?fccid.+$", "\\1")
+      }
+    }
+    job_id <- str_extract(job_url, "[a-z0-9]{16}")
+    for (item in seq_along(job_url)) {
+      if (str_detect(job_url[item], "company\\/.+\\/jobs")) {
+        job_url[item] <- paste0("https://id.indeed.com", job_url[item])
+      } else {
+        job_url[item] <- paste0("https://id.indeed.com/lihat-lowongan-kerja", job_url[item])
+      }
+    }
 
     # job title
     job_position <- htmlraw |>

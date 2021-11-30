@@ -13,7 +13,7 @@ glints_jobid <- function() {
   category <- category$data %>%
     select("id", "name", "descriptionMarkdown") %>%
     as_tibble() %>%
-    arrange("id") %>%
+    arrange(id) %>%
     clean_names()
   return(category)
 
