@@ -7,7 +7,7 @@
 restruct_job(jobls)
 }
 \arguments{
-\item{jobls}{List of job result from gql() function}
+\item{jobls}{A list of job result from \code{gql()} function}
 }
 \value{
 A data.frame of job in tibble format

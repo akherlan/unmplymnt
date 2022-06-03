@@ -2,32 +2,28 @@
 % Please edit documentation in R/gql.R
 \name{gql}
 \alias{gql}
-\title{Request GraphQL Query}
+\title{GraphQL Query Request}
+\source{
+\href{https://gist.github.com/rentrop/83cb1d8fc8593726a808032e55314019/}{Rentrop's Gist}
+}
 \usage{
-gql(
-  query,
-  ...,
-  .token = NULL,
-  .variables = NULL,
-  .operationName = NULL,
-  .url = url
-)
+gql(query, ..., token = NULL, var = NULL, opnam = NULL, url = url)
 }
 \arguments{
 \item{query}{GraphQL query}
 
-\item{...}{Other arguments used by httr::POST()}
+\item{...}{Other arguments used by \code{httr::POST()}}
 
-\item{.token}{Token}
+\item{token}{Token}
 
-\item{.variables}{Variables}
+\item{var}{Variables}
 
-\item{.operationName}{Operation name}
+\item{opnam}{Operation name}
 
-\item{.url}{Complete URL to RestAPI service base to endpoint}
+\item{url}{Complete URL to RestAPI service base to endpoint}
 }
 \value{
-List of query result
+A list of query result
 }
 \description{
 Request data using GraphQL query

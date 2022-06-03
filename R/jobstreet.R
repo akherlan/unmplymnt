@@ -2,7 +2,7 @@
 #'
 #' @description Get job vacancy from Jobstreet's website
 #' @param key Keyword for searching
-#' @param page Pages to be looking at
+#' @param page The amount of pages to be looking at
 #'
 #' @return Job opportunity data.frame in tibble format
 #' @export
@@ -93,7 +93,7 @@ jobstreet <- function(key, page = 1){
     }
   }'
 
-  jobs <- gql(query = query, .variables = var, .url = url)
+  jobs <- gql(query = query, var = var, url = url)
   jobs <- jobs$jobs$jobs
   vacancy <- restruct_job(jobs)
   return(vacancy)

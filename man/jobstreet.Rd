@@ -9,7 +9,7 @@ jobstreet(key, page = 1)
 \arguments{
 \item{key}{Keyword for searching}
 
-\item{page}{Pages to be looking at}
+\item{page}{The amount of pages to be looking at}
 }
 \value{
 Job opportunity data.frame in tibble format

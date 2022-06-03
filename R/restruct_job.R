@@ -1,6 +1,6 @@
 #' Restructuring List to Dataframe
 #'
-#' @param jobls List of job result from gql() function
+#' @param jobls A list of job result from \code{gql()} function
 #'
 #' @return A data.frame of job in tibble format
 #' @export

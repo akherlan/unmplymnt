@@ -4,12 +4,12 @@
 \alias{glints}
 \title{Glints Vacancy}
 \usage{
-glints(jobid, limit = 30)
+glints(key, limit = 30L)
 }
 \arguments{
-\item{jobid}{Defined job's category ID. See glints_jobid() function.}
+\item{key}{Keyword for the jobs}
 
-\item{limit}{Limit amount of job result}
+\item{limit}{Limit amount of job results}
 }
 \value{
 Job vacancy data.frame in tibble format
@@ -19,6 +19,6 @@ Get job vacancy from Glints' website
 }
 \examples{
 \dontrun{
-glints(2, 15) # return data science job
+glints("data analyst", 15) # return data analyst job
 }
 }

@@ -9,7 +9,7 @@ indeed(key, page = 2)
 \arguments{
 \item{key}{Keywords in character}
 
-\item{page}{Numeric indicate number of pages}
+\item{page}{A numeric indicate number of pages to be looking at}
 }
 \value{
 Job opportunity data.frame in tibble format

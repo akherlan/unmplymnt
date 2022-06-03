@@ -2,7 +2,7 @@
 #'
 #' @description Get job vacancy from Indeed's website (Indonesia)
 #' @param key Keywords in character
-#' @param page Numeric indicate number of pages
+#' @param page A numeric indicate number of pages to be looking at
 #'
 #' @return Job opportunity data.frame in tibble format
 #' @export
@@ -32,7 +32,7 @@ indeed <- function(key, page = 2) {
     # get html page
     url <- sprintf("https://id.indeed.com/jobs?q=%s&sort=date&start=%s", query, p)
     url <- url(url, "rb")
-    htmlraw <- read_html(url)
+    htmlraw <- tryCatch(read_html(url))
     close(url)
 
     # get vacancy items
@@ -41,9 +41,14 @@ indeed <- function(key, page = 2) {
       html_children()
 
     # job url for full page direction and the id
-    job_url <- suppressWarnings(item[str_detect(item, "a\\sid")] |> html_attr("href"))
+    # jobsearch-ResultsList
+    job_url <- item[grepl('a id="job', item)] |>
+      html_elements(".jobTitle") |>
+      html_element("a") |>
+      html_attr("href")
     for (item in seq_along(job_url)) {
-      if (str_detect(job_url[item], "\\/rc\\/clk\\?jk")) {
+      # if (str_detect(job_url[item], "\\/rc\\/clk\\?jk")) {
+      if (grepl("/rc/clk\\?jk", job_url[item])) {
         job_url[item] <- str_extract(job_url[item], "\\?jk=[a-z0-9]{16}")
       } else {
         job_url[item] <- str_replace(job_url[item], "^(.+)\\?fccid.+$", "\\1")
@@ -51,7 +56,7 @@ indeed <- function(key, page = 2) {
     }
     job_id <- str_extract(job_url, "[a-z0-9]{16}")
     for (item in seq_along(job_url)) {
-      if (str_detect(job_url[item], "company\\/.+\\/jobs")) {
+      if (grepl("company/.+/jobs", job_url[item])) {
         job_url[item] <- paste0("https://id.indeed.com", job_url[item])
       } else {
         job_url[item] <- paste0("https://id.indeed.com/lihat-lowongan-kerja", job_url[item])

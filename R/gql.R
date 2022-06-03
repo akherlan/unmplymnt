@@ -1,30 +1,37 @@
-#' Request GraphQL Query
+#' GraphQL Query Request
 #'
 #' @description Request data using GraphQL query
 #' @param query GraphQL query
-#' @param ... Other arguments used by httr::POST()
-#' @param .token Token
-#' @param .variables Variables
-#' @param .operationName Operation name
-#' @param .url Complete URL to RestAPI service base to endpoint
+#' @param ... Other arguments used by \code{httr::POST()}
+#' @param token Token
+#' @param var Variables
+#' @param opnam Operation name
+#' @param url Complete URL to RestAPI service base to endpoint
 #'
-#' @return List of query result
+#' @return A list of query result
 #' @export
 #' @import httr
 #' @import jsonlite
+#' @source \href{https://gist.github.com/rentrop/83cb1d8fc8593726a808032e55314019/}{Rentrop's Gist}
 #'
 gql <- function(query,
                 ...,
-                .token = NULL,
-                .variables = NULL,
-                .operationName = NULL,
-                .url = url){
-  pbody <- list(query = query, variables = .variables, operationName = .operationName)
-  if(is.null(.token)){
-    res <- POST(.url, body = pbody, encode = "json", ...)
+                token = NULL,
+                var = NULL,
+                opnam = NULL,
+                url = url){
+  pbody <- list(query = query, variables = var, operationName = opnam)
+  if(is.null(token)){
+    res <- POST(url, body = pbody, encode = "json", ...)
   } else {
-    auth_header <- paste("bearer", .token)
-    res <- POST(.url, body = pbody, encode = "json", add_headers(Authorization=auth_header), ...)
+    auth_header <- paste("bearer", token)
+    res <- POST(
+      url,
+      body = pbody,
+      encode = "json",
+      add_headers(Authorization = auth_header),
+      ...
+    )
   }
   res <- content(res, as = "parsed", encoding = "UTF-8")
   if(!is.null(res$errors)){
