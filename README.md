@@ -15,7 +15,7 @@ remotes::install_github("akherlan/unmplymnt")
 
 ## Usage
 
-There are three main functions of this package: `glints()`, `jobstreet()`, and `indeed()`. All of them are for pulling job vacancies as a data frame.
+There are three main functions of this package: `glints()`, `jobstreet()`, and `indeed()`. All of them are pulling job vacancies from the websites and return as a data frame.
 
 ```r
 library("unmplymnt")
