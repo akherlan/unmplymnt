@@ -6,7 +6,7 @@ The internet should be a place for everyone unless you have no money for just pa
 
 ## Installation
 
-You can install the development version of {readabs} from GitHub with:
+You can install the development version of {unmplymnt} from GitHub with:
 
 ```r
 install.package("remotes")
