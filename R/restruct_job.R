@@ -3,7 +3,7 @@
 #' @param jobls A list of job result from \code{gql()} function
 #'
 #' @return A data.frame of job in tibble format
-#' @export
+#'
 #' @import dplyr
 #' @importFrom tidyr pivot_wider
 #' @importFrom janitor clean_names convert_to_datetime

@@ -4,15 +4,15 @@
 \alias{jobstreet}
 \title{Jobstreet Vacancy}
 \usage{
-jobstreet(key, page = 1)
+jobstreet(key, limit = 30L)
 }
 \arguments{
-\item{key}{Keyword for the jobs}
+\item{key}{(character) Keyword for the jobs}
 
-\item{page}{The amount of pages to be looking at}
+\item{limit}{(numeric) Limit amount of job results}
 }
 \value{
-Job opportunity data.frame in tibble format
+Job vacancy data.frame in tibble format
 }
 \description{
 Get job vacancy from Jobstreet's website
@@ -20,6 +20,7 @@ Get job vacancy from Jobstreet's website
 \examples{
 \dontrun{
 jobstreet("data analyst") # return search result for data analyst
+jobstreet("data engineer", 10) # return 10 data engineer jobs
 }
 
 }

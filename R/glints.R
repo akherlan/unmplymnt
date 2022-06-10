@@ -4,7 +4,7 @@
 #' @param key (character) Keyword for the jobs
 #' @param limit (numeric) Limit amount of job results
 #'
-#' @return (data.frame) Job vacancy data.frame in tibble format
+#' @return Job vacancy data.frame in tibble format
 #'
 #' @examples
 #' \dontrun{

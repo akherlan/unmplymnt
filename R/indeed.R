@@ -1,36 +1,43 @@
 #' Indeed Indonesia Vacancy
 #'
 #' @description Get job vacancy from Indeed's website (Indonesia)
-#' @param key Keyword for the jobs
-#' @param page A numeric indicate number of pages to be looking at
+#' @param key (character) Keyword for the jobs
+#' @param limit (numeric) Limit amount of job results
 #'
-#' @return Job opportunity data.frame in tibble format
-#' @export
-#' @import stringr
-#' @import rvest
-#' @importFrom dplyr bind_rows as_tibble
+#' @return Job vacancy data.frame in tibble format
 #'
 #' @examples
 #' \dontrun{
-#' indeed("data analyst") # return data analyst job
+#' indeed("ux designer") # return UX designer job
 #' }
-indeed <- function(key, page = 2) {
+#'
+#' @import dplyr
+#' @import rvest
+#' @import stringr
+#' @export
+#'
+indeed <- function(key, limit = 30L) {
 
   if (missing(key)) {
     key <- "data analyst"
     message(sprintf('Argument "key" is missing, using default: "%s"', key))
   }
+  # country and subdomain
+  country <- "id"
 
   # query handle
   query <- str_replace_all(key, "\\s+", "+")
 
   # page handle
+  page <- ceiling(limit/15)
   page <- (c(1:page)-1)*10
 
+  message(sprintf("Pulling job data from Indeed %s...", toupper(country)))
   for (p in page) {
 
     # get html page
-    url <- sprintf("https://id.indeed.com/jobs?q=%s&sort=date&start=%s", query, p)
+    url <- sprintf("https://%s.indeed.com/jobs?q=%s&sort=date&start=%s",
+                   country, query, p)
     url <- url(url, "rb")
     htmlraw <- tryCatch(read_html(url))
     close(url)
@@ -57,9 +64,9 @@ indeed <- function(key, page = 2) {
     job_id <- str_extract(job_url, "[a-z0-9]{16}")
     for (item in seq_along(job_url)) {
       if (grepl("company/.+/jobs", job_url[item])) {
-        job_url[item] <- paste0("https://id.indeed.com", job_url[item])
+        job_url[item] <- paste0("https://", country, ".indeed.com", job_url[item])
       } else {
-        job_url[item] <- paste0("https://id.indeed.com/lihat-lowongan-kerja", job_url[item])
+        job_url[item] <- paste0("https://", country, ".indeed.com/lihat-lowongan-kerja", job_url[item])
       }
     }
 
@@ -122,6 +129,10 @@ indeed <- function(key, page = 2) {
     }
   }
 
+  message("Building a data.frame...")
+  vacancy <- distinct(vacancy)[1:limit,]
+
+  message("Done")
   return(vacancy)
 
 }

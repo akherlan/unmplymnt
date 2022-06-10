@@ -4,21 +4,22 @@
 \alias{indeed}
 \title{Indeed Indonesia Vacancy}
 \usage{
-indeed(key, page = 2)
+indeed(key, limit = 30L)
 }
 \arguments{
-\item{key}{Keyword for the jobs}
+\item{key}{(character) Keyword for the jobs}
 
-\item{page}{A numeric indicate number of pages to be looking at}
+\item{limit}{(numeric) Limit amount of job results}
 }
 \value{
-Job opportunity data.frame in tibble format
+Job vacancy data.frame in tibble format
 }
 \description{
 Get job vacancy from Indeed's website (Indonesia)
 }
 \examples{
 \dontrun{
-indeed("data analyst") # return data analyst job
+indeed("ux designer") # return UX designer job
 }
+
 }
