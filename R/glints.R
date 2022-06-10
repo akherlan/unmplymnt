@@ -20,6 +20,8 @@
 #'
 glints <- function(key, limit = 30L) {
 
+  if (limit > 100L) stop('Argument "limit" should not be greater than 100')
+
   if (missing(key)) {
     key <- "data analyst"
     message(sprintf('Argument "key" is missing, using default: "%s"', key))

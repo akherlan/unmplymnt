@@ -3,7 +3,7 @@
 \docType{data}
 \name{glintsjobid}
 \alias{glintsjobid}
-\title{Glints job category ID.}
+\title{Glints job category ID}
 \format{
 A data frame with \code{tibble} format in two fields:
 \describe{
