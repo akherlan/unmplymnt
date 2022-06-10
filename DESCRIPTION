@@ -2,10 +2,14 @@ Package: unmplymnt
 Type: Package
 Title: Looking for Job Opportunity
 Version: 0.0.2.3
-Author: Andi Herlan
-Maintainer: Andi Herlan <andi.herlan@protonmail.com>
+Authors@R: c(
+  person(given = "Andi", 
+         family = "Herlan",
+         role = c("aut", "cre"),
+         email = "andiherlan@protonmail.com")
+  )
 Description: The internet must be a place for everyone unless you have no
-    money for just pay a bill for little bit of request-response data.
+    money for just paying a bill for little bit of request-response data.
     You must have a job.
 License: GPL (>= 3)
 Encoding: UTF-8
@@ -21,4 +25,4 @@ Imports:
     rvest,
     purrr
 Depends: 
-    R (>= 2.10)
+    R (>= 4.1)

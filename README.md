@@ -2,7 +2,7 @@
 
 **Looking for Job Opportunity**
 
-The internet should be a place for everyone unless you have no money for just pay a bill for little bit of request-response data. You must have a job.
+The internet should be a place for everyone unless you have no money for just paying a bill for little bit of request-response data. You must have a job.
 
 ## Installation
 
@@ -26,4 +26,4 @@ indeed("data analyst") # return data analyst job from Indeed (ID)
 
 ## Disclaimer
 
-The {unmplymnt} package is not associated with the mentioned job information providers. All data is provided subject to any restrictions, terms of use, and licensing arrangements noted on each website.
+The {unmplymnt} package is not associated with the mentioned job information providers. All data is provided subject to any restrictions, terms of use, and licensing arrangements noted on each website (we tried to).
