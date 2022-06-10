@@ -7,7 +7,7 @@
 indeed(key, page = 2)
 }
 \arguments{
-\item{key}{Keywords in character}
+\item{key}{Keyword for the jobs}
 
 \item{page}{A numeric indicate number of pages to be looking at}
 }

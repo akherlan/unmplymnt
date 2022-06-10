@@ -9,9 +9,10 @@
 #' @param url Complete URL to RestAPI service base to endpoint
 #'
 #' @return A list of query result
-#' @export
+#'
 #' @import httr
 #' @import jsonlite
+#'
 #' @source \href{https://gist.github.com/rentrop/83cb1d8fc8593726a808032e55314019/}{Rentrop's Gist}
 #'
 gql <- function(query,
@@ -21,7 +22,7 @@ gql <- function(query,
                 opnam = NULL,
                 url = url){
   pbody <- list(query = query, variables = var, operationName = opnam)
-  if(is.null(token)){
+  if (is.null(token)) {
     res <- POST(url, body = pbody, encode = "json", ...)
   } else {
     auth_header <- paste("bearer", token)
@@ -34,8 +35,8 @@ gql <- function(query,
     )
   }
   res <- content(res, as = "parsed", encoding = "UTF-8")
-  if(!is.null(res$errors)){
+  if (!is.null(res$errors)) {
     warning(toJSON(res$errors))
   }
-  res$data
+  return(res$data)
 }

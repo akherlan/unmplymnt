@@ -1,21 +1,25 @@
 #' Jobstreet Vacancy
 #'
 #' @description Get job vacancy from Jobstreet's website
-#' @param key Keyword for searching
+#' @param key Keyword for the jobs
 #' @param page The amount of pages to be looking at
 #'
 #' @return Job opportunity data.frame in tibble format
-#' @export
 #'
 #' @examples
 #' \dontrun{
 #' jobstreet("data analyst") # return search result for data analyst
 #' }
-jobstreet <- function(key, page = 1){
+#'
+#' @export
+#'
+jobstreet <- function(key, page = 1) {
+
   if (missing(key)) {
-    message('Argument "key" is missing, using default: "data analyst"')
     key <- "data analyst"
+    message(sprintf('Argument "key" is missing, using default: "%s"', key))
   }
+
   url <- "https://xapi.supercharge-srp.co/job-search/graphql?country=id&isSmartSearch=true"
   var <- sprintf('{
     "keyword": "%s",

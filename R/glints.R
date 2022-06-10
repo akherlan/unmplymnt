@@ -1,20 +1,23 @@
 #' Glints Vacancy
 #'
 #' @description Get job vacancy from Glints' website
-#' @param key Keyword for the jobs
-#' @param limit Limit amount of job results
+#' @param key (character) Keyword for the jobs
+#' @param limit (numeric) Limit amount of job results
 #'
-#' @return Job vacancy data.frame in tibble format
-#' @import dplyr
-#' @importFrom purrr map_df
-#' @importFrom janitor clean_names
-#' @importFrom stringr str_to_title str_squish
-#' @export
+#' @return (data.frame) Job vacancy data.frame in tibble format
 #'
 #' @examples
 #' \dontrun{
 #' glints("data analyst", 15) # return data analyst job
 #' }
+#'
+#' @import dplyr
+#' @importFrom purrr map_df
+#' @importFrom janitor clean_names convert_to_datetime
+#' @importFrom stringr str_to_title str_squish str_replace
+#'
+#' @export
+#'
 glints <- function(key, limit = 30L) {
 
   if (missing(key)) {
@@ -24,6 +27,7 @@ glints <- function(key, limit = 30L) {
 
   url <- "https://glints.com/api/graphql"
   opnam <- "searchJobs"
+
   var <- sprintf('{
     "data": {
 			"CountryCode": "ID",
@@ -32,10 +36,7 @@ glints <- function(key, limit = 30L) {
 			"offset": 90,
 			"prioritiseHotJobs": true,
 			"SearchTerm": "%s",
-			"sources": [
-				"NATIVE",
-				"SUPER_POWERED"
-			]
+			"sources": [ "NATIVE" ]
 		}
   }', limit, key)
 
@@ -59,16 +60,14 @@ glints <- function(key, limit = 30L) {
           name
         }
         citySubDivision {
-          id
           name
         }
         city {
-          id
           name
         }
         country {
-          code
           name
+          code
         }
         category {
           id
@@ -92,12 +91,12 @@ glints <- function(key, limit = 30L) {
 
   jobs <- gql(query = query, var = var, opnam = opnam, url = url)
   jobs <- jobs$searchJobs$jobsInPage
-  vacancy <- map_df(jobs, ~as_tibble(t(unlist(.x))))
+  vacancy <- map_df(jobs, ~as_tibble(t(unlist(.x)), .name_repair = "minimal"))
   vacancy <- clean_names(vacancy)
   # vacancy <- restruct_job(jobs)
   vacancy <- vacancy %>%
     mutate(job_url = paste0("https://glints.com/id/opportunities/jobs/", id),
-           source = paste("Glints", str_to_title(source)),
+           source = paste("Glints", str_to_title(str_replace(source, "_", " "))),
            title = str_squish(title)) %>%
     select(
       "id", "title", "job_url", "created_at", "source", matches("category"),

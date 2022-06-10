@@ -1,21 +1,23 @@
 #' Job Description Formation
 #'
 #' @param urls vector of url list
+#' @param markdown Logical. If TRUE it will return markdown format text.
 #'
 #' @return vector text explanation contained jobdesc
-#' @export
+#'
 #' @import rvest
 #' @import dplyr
 #' @import stringr
+#' @export
 #'
-jobdescform <- function(urls, format = "md") {
+jobdescform <- function(urls, markdown = TRUE) {
   for (n in urls) {
     # get html
     url <- url(n, "rb")
     f <- read_html(url)
     close(url)
     # assume prefered description tag
-    desc <- html_element(f, ".vDEj0_0")
+    desc <- html_element(f, ".YCeva_0")
     desc <- desc %>%
       html_children() %>%
       html_children() %>%
@@ -80,6 +82,15 @@ jobdescform <- function(urls, format = "md") {
       str_remove("<br>$")
     if (n == urls[[1]]) txt <- topost_text
     else txt <- append(txt, topost_text)
+  }
+  if (markdown) {
+    txt <- sapply(txt, function(html) {
+      html %>%
+        str_replace_all("<br>", "\n") %>%
+        str_replace_all("<strong>", "*") %>%
+        str_replace_all("</strong>", "*") %>%
+        str_replace_all("\\*\\*", "*")
+    }, USE.NAMES = FALSE)
   }
   return(txt)
 }

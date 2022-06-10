@@ -7,7 +7,7 @@
 jobstreet(key, page = 1)
 }
 \arguments{
-\item{key}{Keyword for searching}
+\item{key}{Keyword for the jobs}
 
 \item{page}{The amount of pages to be looking at}
 }
@@ -21,4 +21,5 @@ Get job vacancy from Jobstreet's website
 \dontrun{
 jobstreet("data analyst") # return search result for data analyst
 }
+
 }

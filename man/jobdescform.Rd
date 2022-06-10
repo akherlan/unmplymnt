@@ -4,10 +4,12 @@
 \alias{jobdescform}
 \title{Job Description Formation}
 \usage{
-jobdescform(urls, format = "md")
+jobdescform(urls, markdown = TRUE)
 }
 \arguments{
 \item{urls}{vector of url list}
+
+\item{markdown}{Logical. If TRUE it will return markdown format text.}
 }
 \value{
 vector text explanation contained jobdesc

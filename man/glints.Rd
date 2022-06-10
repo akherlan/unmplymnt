@@ -7,12 +7,12 @@
 glints(key, limit = 30L)
 }
 \arguments{
-\item{key}{Keyword for the jobs}
+\item{key}{(character) Keyword for the jobs}
 
-\item{limit}{Limit amount of job results}
+\item{limit}{(numeric) Limit amount of job results}
 }
 \value{
-Job vacancy data.frame in tibble format
+(data.frame) Job vacancy data.frame in tibble format
 }
 \description{
 Get job vacancy from Glints' website
@@ -21,4 +21,5 @@ Get job vacancy from Glints' website
 \dontrun{
 glints("data analyst", 15) # return data analyst job
 }
+
 }

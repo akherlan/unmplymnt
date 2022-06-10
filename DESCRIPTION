@@ -1,7 +1,7 @@
 Package: unmplymnt
 Type: Package
 Title: Looking for Job Opportunity
-Version: 0.0.2
+Version: 0.0.2.1
 Author: Andi Herlan
 Maintainer: Andi Herlan <andi.herlan@protonmail.com>
 Description: The internet must be a place for everyone unless you have no
@@ -18,4 +18,7 @@ Imports:
     tidyr,
     janitor,
     stringr,
-    rvest
+    rvest,
+    purrr
+Depends: 
+    R (>= 2.10)

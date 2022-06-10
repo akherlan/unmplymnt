@@ -1,7 +1,7 @@
 #' Indeed Indonesia Vacancy
 #'
 #' @description Get job vacancy from Indeed's website (Indonesia)
-#' @param key Keywords in character
+#' @param key Keyword for the jobs
 #' @param page A numeric indicate number of pages to be looking at
 #'
 #' @return Job opportunity data.frame in tibble format
@@ -17,8 +17,8 @@
 indeed <- function(key, page = 2) {
 
   if (missing(key)) {
-    message('Argument "key" is missing, using default: "data analyst"')
     key <- "data analyst"
+    message(sprintf('Argument "key" is missing, using default: "%s"', key))
   }
 
   # query handle
@@ -104,7 +104,7 @@ indeed <- function(key, page = 2) {
       str_remove_all("\\.") |>
       as.numeric()
 
-    # generate data.frame
+    # generate dataframe
     joblist <- data.frame(
       id = job_id,
       job_title = job_position,
@@ -117,7 +117,9 @@ indeed <- function(key, page = 2) {
       salary_until = salary_until
     ) |> as_tibble()
 
-    if (p == 0) vacancy <- joblist else vacancy <- bind_rows(vacancy, joblist)
+    if (p == 0) { vacancy <- joblist } else {
+      vacancy <- bind_rows(vacancy, joblist)
+    }
   }
 
   return(vacancy)
