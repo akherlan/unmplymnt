@@ -1,5 +1,10 @@
 # unmplymnt
 
+![GitHub](https://img.shields.io/github/license/akherlan/unmplymnt?color=informational)
+![GitHub R package version (branch & subdirectory of monorepo)](https://img.shields.io/github/r-package/v/akherlan/unmplymnt/main?color=informational&filename=DESCRIPTION&logo=r)
+![GitHub issues](https://img.shields.io/github/issues/akherlan/unmplymnt)
+![GitHub last commit](https://img.shields.io/github/last-commit/akherlan/unmplymnt?color=informational&logo=github)
+
 **Looking for Job Opportunity**
 
 The internet should be a place for everyone unless you have no money for just paying a bill for little bit of request-response data. You must have a job.
