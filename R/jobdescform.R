@@ -8,7 +8,6 @@
 #' @import rvest
 #' @import dplyr
 #' @import stringr
-#' @export
 #'
 jobdescform <- function(urls, markdown = TRUE) {
   for (n in urls) {
@@ -51,12 +50,13 @@ jobdescform <- function(urls, markdown = TRUE) {
     desc <- desc %>%
       mutate(content = str_squish(content),
              content = ifelse(str_detect(tag, "li"),
-                              str_replace(content, "^(.+)$", "• \\1"),
+                              str_replace(content, "^(.+)$", "\u2022 \\1"),
                               content),
              content = ifelse((tag == "div" | tag == "p") &
                                 str_count(content, "\\w+\\s") < 4 &
                                 !str_detect(content, "^-\\s") &
-                                !str_detect(content, "•\\s"),
+                                #!str_detect(content, "•\\s"),
+                                !str_detect(content, "\u2022\\s"),
                               str_replace(content, "^(.+)$", "<strong>\\1</strong>"),
                               content),
              content = ifelse((tag == "div" | tag == "p") & nchar(content) < 50,
@@ -75,7 +75,7 @@ jobdescform <- function(urls, markdown = TRUE) {
       toString() %>%
       str_replace_all(",\\s,\\s", "<br>") %>%
       str_replace_all(">,\\s", ">") %>%
-      str_replace_all("<br>-\\s", "<br>• ") %>%
+      str_replace_all("<br>-\\s", "<br>\u2022 ") %>%
       str_replace_all("(\\w+\\.?\\s?)<br>(\\w+)", "\\1<br><br>\\2") %>%
       str_replace_all("<br></strong>(<br>)?", "</strong><br><br>") %>%
       str_remove("^<br>") %>%

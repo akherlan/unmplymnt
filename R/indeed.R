@@ -4,8 +4,6 @@
 #' @param key (character) Keyword for the jobs
 #' @param limit (numeric) Limit amount of job results
 #'
-#' @return Job vacancy data.frame in tibble format
-#'
 #' @examples
 #' \dontrun{
 #' indeed("ux designer") # return UX designer job
@@ -14,7 +12,6 @@
 #' @import dplyr
 #' @import rvest
 #' @import stringr
-#' @export
 #'
 indeed <- function(key, limit = 30L) {
 
@@ -92,8 +89,8 @@ indeed <- function(key, limit = 30L) {
     location <- htmlraw |>
       html_elements(".companyLocation") |>
       html_text()
-    company_location <- str_replace(location, "^(.+)\\s?•\\s?.+", "\\1")
-    working_location <- str_extract(location, "^.+\\s?•\\s?(.+)") |> str_remove("^.+\\s?•\\s?")
+    company_location <- str_replace(location, "^(.+)\\s?\u2022\\s?.+", "\\1")
+    working_location <- str_extract(location, "^.+\\s?\u2022\\s?(.+)") |> str_remove("^.+\\s?\u2022\\s?")
 
     # salary
     salary <- htmlraw |>

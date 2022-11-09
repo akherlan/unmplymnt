@@ -26,7 +26,7 @@ There are three main functions of this package: `glints()`, `jobstreet()`, and `
 library("unmplymnt")
 glints() # return data analyst job from Glints
 jobstreet("data engineer") # return latest data engineering job
-indeed("data analyst") # return data analyst job from Indeed (ID)
+kalibrr("data analyst", remote = TRUE) # return remote data analyst job from Kalibrr Indonesia
 ```
 
 ## Disclaimer

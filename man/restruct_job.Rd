@@ -4,10 +4,10 @@
 \alias{restruct_job}
 \title{Restructuring List to Dataframe}
 \usage{
-restruct_job(jobls)
+restruct_job(jobs)
 }
 \arguments{
-\item{jobls}{A list of job result from \code{gql()} function}
+\item{jobs}{A list of job result from \code{gql()} function}
 }
 \value{
 A data.frame of job in tibble format

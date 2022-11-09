@@ -1,18 +1,19 @@
 #' Restructuring List to Dataframe
 #'
-#' @param jobls A list of job result from \code{gql()} function
+#' @param jobs A list of job result from \code{gql()} function
 #'
 #' @return A data.frame of job in tibble format
 #'
 #' @import dplyr
 #' @importFrom tidyr pivot_wider
-#' @importFrom janitor clean_names convert_to_datetime
+#' @importFrom janitor clean_names
+#' @importFrom lubridate ymd
 #'
-restruct_job <- function(jobls){
+restruct_job <- function(jobs){
 
   # restructure
-  for (i in seq_along(jobls)) {
-    v <- unlist(jobls[[i]])
+  for (i in seq_along(jobs)) {
+    v <- unlist(jobs[[i]])
     v <- cbind(name = names(v), value = v)
     v <- as_tibble(v) %>% mutate(num = i)
     if(i == 1){
@@ -36,38 +37,31 @@ restruct_job <- function(jobls){
     clean_names()
 
   # arrange
-  if (nchar(vacancy$id[1]) == 7) { # jobstreet
+  if (nchar(vacancy$job_id[1]) == 7) { # jobstreet
 
     vacancy <- vacancy %>%
-      mutate(job_url = paste0("https://www.jobstreet.co.id/id/job/", id),
-             source = "Jobstreet") %>%
+      mutate(job_url = paste0("https://www.jobstreet.co.id/id/job/", job_id),
+             source = "Jobstreet",
+             country = "Indonesia",
+             is_remote = NA,
+             posted_at = ymd(str_replace(posted_at, "^(\\d{4}-\\d{2}-\\d{2}).+$", "\\1"))) %>%
       select(
-        "id", matches("job"), "posted_at", "source", matches("categories"),
-        matches("company"), matches("employ"), matches("is_"),
-        matches("location"), matches("country"),
-        matches("salary"), matches("selling")
-      ) %>%
-      filter(source_country_code == "id") %>%
-      mutate(source = "Jobstreet")
-    vacancy$posted_at <- convert_to_datetime(vacancy$posted_at)
-    attributes(vacancy$posted_at)$tzone <- Sys.timezone()
-
-  }
-
-  else if (nchar(vacancy$id[1]) == 36) { # glints
-
-    vacancy <- vacancy %>%
-      mutate(job_url = paste0("https://glints.com/id/opportunities/jobs/", id),
-             source = "Glints") %>%
-      select(
-        "id", "title", "job_url", "created_at", "source", matches("category"),
-        matches("city"), "country_name", "applicant_count", matches("company"),
-        matches("experience"), matches("salaries"), matches("salary_estimate"),
-        "status", "is_remote"
+        "job_title",
+        "company" = "company_name",
+        "city" = "city_name",
+        "country",
+        "is_remote",
+        "category" = "category_name",
+        "salary_currency",
+        "salary_min",
+        "salary_max",
+        "salary_period",
+        matches("employ"),
+        "posted_at",
+        "source",
+        "job_url",
+        "job_id"
       )
-    vacancy <- rename(vacancy, "job_title" = "title", "posted_at" = "created_at")
-    vacancy$posted_at <- convert_to_datetime(vacancy$posted_at)
-    attributes(vacancy$posted_at)$tzone <- Sys.timezone()
 
   } else {
 

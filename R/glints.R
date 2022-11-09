@@ -1,10 +1,8 @@
 #' Glints Vacancy
 #'
-#' @description Get job vacancy from Glints' website
-#' @param key (character) Keyword for the jobs
-#' @param limit (numeric) Limit amount of job results
-#'
-#' @return Job vacancy data.frame in tibble format
+#' @description Get job vacancy from Glints' website.
+#' @param key A character indicate the keyword for job search.
+#' @param limit Limit amount of job results to return. Maximum 100.
 #'
 #' @examples
 #' \dontrun{
@@ -13,11 +11,14 @@
 #'
 #' @import dplyr
 #' @importFrom purrr map_df
-#' @importFrom janitor clean_names convert_to_datetime
+#' @importFrom janitor clean_names
+#' @importFrom lubridate ymd
 #' @importFrom stringr str_to_title str_squish str_replace
 #'
 #' @export
 #'
+
+
 glints <- function(key, limit = 30L) {
 
   if (limit > 100L) stop('Argument "limit" should not be greater than 100')
@@ -31,98 +32,108 @@ glints <- function(key, limit = 30L) {
   country <- "ID"
 
   var <- sprintf('{
-    "data": {
-			"CountryCode": "%s",
-			"includeExternalJobs": false,
-			"limit": %s,
-			"offset": 90,
-			"prioritiseHotJobs": true,
-			"SearchTerm": "%s",
-			"sources": [ "NATIVE" ]
-		}
-  }', country, limit, key)
+  	"data": {
+  		"SearchTerm": "%s",
+  		"CountryCode": "%s",
+  		"limit": %s,
+  		"offset": 90,
+  		"prioritiseHotJobs": true,
+  		"includeExternalJobs": false,
+  		"sources": "NATIVE"
+  	}
+  }', key, country, limit)
 
-  query <- 'query searchJobs($data: JobSearchConditionInput!) {
-    searchJobs(data: $data) {
-      jobsInPage {
-        id
-        title
-        isRemote
-        status
-        createdAt
-        isActivelyHiring
-        isHot
+  query <- "query searchJobs($data: JobSearchConditionInput!) {
+    search: searchJobs(data: $data) {
+      jobs: jobsInPage {
+        job_id: id
+        job_title: title
+        is_remote: isRemote
+        posted_at: createdAt
         company {
-          name
-        }
-        citySubDivision {
-          name
+          id
+  				name
         }
         city {
           name
         }
         country {
           name
-          code
         }
         category {
           id
           name
         }
-        salaries {
-          salaryType
-          salaryMode
-          maxAmount
-          minAmount
-          CurrencyCode
+        salary: salaries {
+  				salary_period: salaryMode
+  				salary_currency: CurrencyCode
+  				salary_max: maxAmount
+  				salary_min: minAmount
+          salary_type: salaryType
         }
-        minYearsOfExperience
-        maxYearsOfExperience
+        employment_expmin: minYearsOfExperience
+        employment_expmax: maxYearsOfExperience
         source
       }
-      totalJobs
     }
-  }'
+  }"
 
   message(sprintf("Pulling job data from Glints %s...", country))
   jobs <- gql(query = query, var = var, opnam = opnam, url = url)
-  jobs <- jobs$searchJobs$jobsInPage
+  jobs <- jobs$search$jobs
 
   message("Building a data.frame...")
   # reforming salaries to include only BASIC type and eliminate BONUS type
   salaries <- map_df(jobs, ~{
-    salaries <- map_df(.x$salaries, ~{.x})
-    if (nrow(salaries) > 1) {
-      salaries <- dplyr::filter(salaries, salaryType == "BASIC")
+    salaries <- map_df(.x$salary, ~{.x})
+    if (nrow(salaries) >= 1) {
+      salaries <- dplyr::filter(salaries, salary_type == "BASIC")
     } else if (nrow(salaries) < 1) {
-      salaries <- tibble(salaryType = NA_character_,
-                         salaryMode = NA_character_,
-                         maxAmount = NA_integer_,
-                         minAmount = NA_integer_,
-                         CurrencyCode = NA_character_)
+      salaries <- tibble(salary_type = NA_character_,
+                         salary_mode = NA_character_,
+                         max_amount = NA_integer_,
+                         min_amount = NA_integer_,
+                         currency = NA_character_)
     } else { salaries }
   })
   # reforming complete vacancy data frame
-  vacancy <- map_df(jobs, ~{
-    .x[["salaries"]] <- NULL
-    as_tibble(t(unlist(.x)))
+  vacancies <- map_df(jobs, ~{
+    .x[["salary"]] <- NULL
+    vacancy <- as_tibble(t(unlist(.x)))
+    vacancy <- clean_names(vacancy)
   })
-  vacancy <- bind_cols(vacancy, salaries)
-  vacancy <- clean_names(vacancy)
-  vacancy <- vacancy %>%
-    mutate(job_url = paste0("https://glints.com/id/opportunities/jobs/", id),
-           source = paste("Glints", str_to_title(str_replace(source, "_", " "))),
-           title = str_squish(title)) %>%
-    select(
-      "id", "title", "job_url", "created_at", "source", matches("category"),
-      matches("city"), "country_name", matches("company"),
-      matches("experience"), matches("salary"), matches("amount"),
-      matches("currency"), "status", "is_remote"
+  vacancies <- bind_cols(vacancies, salaries)
+  vacancies <- vacancies %>%
+    mutate(
+      job_url = paste0("https://glints.com/id/opportunities/jobs/", job_id),
+      source = paste("Glints", str_to_title(str_replace(source, "_", " "))),
+      job_title = str_squish(job_title),
+      is_remote = as.logical(is_remote),
+      posted_at = ymd(str_replace(posted_at, "^(\\d{4}-\\d{2}-\\d{2}).+$", "\\1"))
     ) %>%
-    rename("job_title" = "title", "posted_at" = "created_at")
-  vacancy$posted_at <- convert_to_datetime(vacancy$posted_at)
-  attributes(vacancy$posted_at)$tzone <- "Asia/Jakarta" # Sys.timezone()
+    select(
+      "job_title",
+      company = company_name,
+      city = city_name,
+      country = country_name,
+      "is_remote",
+      category = category_name,
+      "salary_currency",
+      "salary_min",
+      "salary_max",
+      "salary_period",
+      "salary_type",
+      matches("employ"),
+      "posted_at",
+      "source",
+      "job_url",
+      "job_id"
+    )
+  #vacancies$posted_at <- ymd(
+  #  str_replace(vacancies$posted_at, "^(\\d{4}-\\d{2}-\\d{2}).+$", "\\1")
+  #)
+  #attributes(vacancies$posted_at)$tzone <- "Asia/Jakarta"
   message("Done")
-  return(vacancy)
+  return(vacancies)
 
 }

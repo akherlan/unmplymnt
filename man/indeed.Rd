@@ -11,9 +11,6 @@ indeed(key, limit = 30L)
 
 \item{limit}{(numeric) Limit amount of job results}
 }
-\value{
-Job vacancy data.frame in tibble format
-}
 \description{
 Get job vacancy from Indeed's website (Indonesia)
 }
