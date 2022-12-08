@@ -1,7 +1,7 @@
 Package: unmplymnt
 Type: Package
 Title: Looking for Job Opportunity
-Version: 0.1.2
+Version: 0.1.2.1
 Authors@R: c(
   person(given = "Andi", 
          family = "Herlan",

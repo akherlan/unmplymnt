@@ -32,15 +32,15 @@ glints <- function(key, limit = 30L) {
   country <- "ID"
 
   var <- sprintf('{
-  	"data": {
-  		"SearchTerm": "%s",
-  		"CountryCode": "%s",
-  		"limit": %s,
-  		"offset": 90,
-  		"prioritiseHotJobs": true,
-  		"includeExternalJobs": false,
-  		"sources": "NATIVE"
-  	}
+    "data": {
+      "SearchTerm": "%s",
+      "CountryCode": "%s",
+      "limit": %i,
+      "offset": 90,
+      "prioritiseHotJobs": true,
+      "includeExternalJobs": false,
+      "sources": "NATIVE"
+    }
   }', key, country, limit)
 
   query <- "query searchJobs($data: JobSearchConditionInput!) {
@@ -52,7 +52,7 @@ glints <- function(key, limit = 30L) {
         posted_at: createdAt
         company {
           id
-  				name
+          name
         }
         city {
           name
@@ -65,10 +65,10 @@ glints <- function(key, limit = 30L) {
           name
         }
         salary: salaries {
-  				salary_period: salaryMode
-  				salary_currency: CurrencyCode
-  				salary_max: maxAmount
-  				salary_min: minAmount
+          salary_period: salaryMode
+          salary_currency: CurrencyCode
+          salary_max: maxAmount
+          salary_min: minAmount
           salary_type: salaryType
         }
         employment_expmin: minYearsOfExperience
@@ -84,18 +84,22 @@ glints <- function(key, limit = 30L) {
 
   message("Building a data.frame...")
   # reforming salaries to include only BASIC type and eliminate BONUS type
-  salaries <- map_df(jobs, ~{
-    salaries <- map_df(.x$salary, ~{.x})
-    if (nrow(salaries) >= 1) {
-      salaries <- dplyr::filter(salaries, salary_type == "BASIC")
-    } else if (nrow(salaries) < 1) {
-      salaries <- tibble(salary_type = NA_character_,
-                         salary_mode = NA_character_,
-                         max_amount = NA_integer_,
-                         min_amount = NA_integer_,
-                         currency = NA_character_)
-    } else { salaries }
+  salaries <- map(jobs, ~{
+    salary <- unlist(.x$salary)
+    if (!is.null(salary)) {
+      salary <- as_tibble(t(salary))
+    } else {
+      salary <- tibble(
+        salary_type = NA_character_,
+        salary_period = NA_character_,
+        salary_max = NA_character_, # NA_integer_
+        salary_min = NA_character_, # NA_integer_
+        salary_currency = NA_character_
+      )
+    }
+    salary
   })
+  salaries <- do.call(bind_rows, salaries)
   # reforming complete vacancy data frame
   vacancies <- map_df(jobs, ~{
     .x[["salary"]] <- NULL
