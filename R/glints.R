@@ -36,8 +36,7 @@ glints <- function(key, limit = 30L) {
       "SearchTerm": "%s",
       "CountryCode": "%s",
       "limit": %i,
-      "offset": 90,
-      "prioritiseHotJobs": true,
+      "offset": 0,
       "includeExternalJobs": false,
       "sources": "NATIVE"
     }
@@ -103,7 +102,7 @@ glints <- function(key, limit = 30L) {
   # reforming complete vacancy data frame
   vacancies <- map_df(jobs, ~{
     .x[["salary"]] <- NULL
-    vacancy <- as_tibble(t(unlist(.x)))
+    vacancy <- as_tibble(t(unlist(.x)), .name_repair = 'unique')
     vacancy <- clean_names(vacancy)
   })
   vacancies <- bind_cols(vacancies, salaries)
