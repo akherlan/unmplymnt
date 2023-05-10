@@ -51,7 +51,7 @@ kalibrr <- function(key, limit = 30L, remote = FALSE) {
     paste0(
       "https://www.kalibrr.com",
       card %>%
-        html_element("h3 > a") %>%
+        html_element("h2 > a") %>%
         html_attr("href")
     )
   }
@@ -62,7 +62,7 @@ kalibrr <- function(key, limit = 30L, remote = FALSE) {
 
   get_title <- function(card) {
     card %>%
-      html_element("h3") %>%
+      html_element("h2 > a") %>%
       html_text(trim = TRUE)
   }
 
