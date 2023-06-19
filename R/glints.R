@@ -108,7 +108,7 @@ glints <- function(key, limit = 30L) {
   vacancies <- bind_cols(vacancies, salaries)
   vacancies <- vacancies %>%
     mutate(
-      job_url = paste0("https://glints.com/id/opportunities/jobs/", job_id),
+      job_url = paste0("https://glints.com/id/opportunities/jobs/", .$job_id),
       source = paste("Glints", str_to_title(str_replace(source, "_", " "))),
       job_title = str_squish(job_title),
       is_remote = as.logical(is_remote),
