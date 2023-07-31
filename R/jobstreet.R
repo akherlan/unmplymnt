@@ -48,7 +48,12 @@ jobstreet <- function(key, limit = 30L) {
            auto_unbox = TRUE)
   })
 
-  query <- paste(readLines("R/jobstreet.gql"), collapse = "")
+  querypath <- list.files(
+    system.file("extdata/graphql", package = "unmplymnt"),
+    pattern = "jobstreet",
+    full.names = TRUE
+  )
+  query <- paste(readLines(querypath), collapse = "")
 
   message(sprintf("Pulling job data from Jobstreet (Seek %s)...",
                   toupper(country)))

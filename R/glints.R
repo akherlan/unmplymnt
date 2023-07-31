@@ -157,7 +157,12 @@ glints <- function(key, limit = 30L) {
   url <- "https://glints.com/api/graphql"
   opnam <- "searchJobs"
   country <- "ID"
-  query <- paste(readLines("R/glints.gql"), collapse = "")
+  querypath <- list.files(
+    system.file("extdata/graphql", package = "unmplymnt"),
+    pattern = "glints",
+    full.names = TRUE
+  )
+  query <- paste(readLines(querypath), collapse = "")
   message(sprintf("Pulling job data from Glints %s...", country))
   if (limit > 100) {
     offset <- (seq(1, ceiling(limit / 100)) - 1) * 100
