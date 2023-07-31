@@ -1,0 +1,34 @@
+query searchJobs($data: JobSearchConditionInput!) {
+    search: searchJobs(data: $data) {
+      jobs: jobsInPage {
+        job_id: id
+        job_title: title
+        is_remote: isRemote
+        posted_at: createdAt
+        company {
+          id
+          name
+        }
+        city {
+          name
+        }
+        country {
+          name
+        }
+        category {
+          id
+          name
+        }
+        salary: salaries {
+          salary_period: salaryMode
+          salary_currency: CurrencyCode
+          salary_max: maxAmount
+          salary_min: minAmount
+          salary_type: salaryType
+        }
+        employment_expmin: minYearsOfExperience
+        employment_expmax: maxYearsOfExperience
+        source
+      }
+    }
+  }

@@ -129,7 +129,6 @@ indeed <- function(key, limit = 30L) {
   message("Building a data.frame...")
   vacancy <- distinct(vacancy)[1:limit,]
 
-  message("Done")
   return(vacancy)
 
 }

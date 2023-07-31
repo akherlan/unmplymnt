@@ -1,8 +1,8 @@
 #' Glints Vacancy
 #'
 #' @description Get job vacancy from Glints' website.
-#' @param key A character indicate the keyword for job search.
-#' @param limit Limit amount of job results to return. Maximum 100.
+#' @param key Characters indicate the keyword for job search
+#' @param limit Number of limit for job results
 #'
 #' @examples
 #' \dontrun{
@@ -10,133 +10,182 @@
 #' }
 #'
 #' @import dplyr
-#' @importFrom purrr map_df
-#' @importFrom janitor clean_names
+#' @importFrom purrr map map_df
 #' @importFrom lubridate ymd
-#' @importFrom stringr str_to_title str_squish str_replace
+#' @importFrom stringr str_to_title str_squish str_replace str_remove
 #'
 #' @export
 #'
 
 
 glints <- function(key, limit = 30L) {
-
-  if (limit > 100L) stop('Argument "limit" should not be greater than 100')
   if (missing(key)) {
     key <- "data analyst"
     message(sprintf('Argument "key" is missing, using default: "%s"', key))
   }
-
-  url <- "https://glints.com/api/graphql"
-  opnam <- "searchJobs"
-  country <- "ID"
-
-  var <- sprintf('{
-    "data": {
-      "SearchTerm": "%s",
-      "CountryCode": "%s",
-      "limit": %i,
-      "offset": 0,
-      "includeExternalJobs": false,
-      "sources": "NATIVE"
+  generate_variable <- function(key, country, limit, offset) {
+    vardata <- toJSON(
+      list(
+        data = list(
+          SearchTerm = key,
+          CountryCode = country,
+          limit = limit,
+          offset = offset,
+          includeExternalJobs = FALSE,
+          sources = "NATIVE"
+        )
+      ),
+      auto_unbox = TRUE
+    )
+    return(vardata)
+  }
+  extract_jobid <- function(item) {
+    return(item$job_id)
+  }
+  extract_jobtitle <- function(item) {
+    return(str_squish(item$job_title))
+  }
+  extract_remote <- function(item) {
+    return(item$is_remote)
+  }
+  extract_company <- function(item) {
+    return(item$company$name)
+  }
+  extract_category <- function(item) {
+    return(item$category$name)
+  }
+  extract_country <- function(item) {
+    return(item$country$name)
+  }
+  extract_city <- function(item) {
+    if (length(item$city) == 1) {
+      city <- item$city$name
+    } else {
+      city <- paste(
+        as.vector(sapply(item$city, function(x) x$name)),
+        collapse = ", "
+      )
     }
-  }', key, country, limit)
-
-  query <- "query searchJobs($data: JobSearchConditionInput!) {
-    search: searchJobs(data: $data) {
-      jobs: jobsInPage {
-        job_id: id
-        job_title: title
-        is_remote: isRemote
-        posted_at: createdAt
-        company {
-          id
-          name
-        }
-        city {
-          name
-        }
-        country {
-          name
-        }
-        category {
-          id
-          name
-        }
-        salary: salaries {
-          salary_period: salaryMode
-          salary_currency: CurrencyCode
-          salary_max: maxAmount
-          salary_min: minAmount
-          salary_type: salaryType
-        }
-        employment_expmin: minYearsOfExperience
-        employment_expmax: maxYearsOfExperience
-        source
-      }
-    }
-  }"
-
-  message(sprintf("Pulling job data from Glints %s...", country))
-  jobs <- gql(query = query, var = var, opnam = opnam, url = url)
-  jobs <- jobs$search$jobs
-
-  message("Building a data.frame...")
-  # reforming salaries to include only BASIC type and eliminate BONUS type
-  salaries <- map(jobs, ~{
-    salary <- unlist(.x$salary)
+    return(city)
+  }
+  extract_date_published <- function(item) {
+    date_published <- tryCatch(
+      ymd(
+        str_replace(
+          string = item$posted_at,
+          pattern = "^(\\d{4}-\\d{2}-\\d{2}).+$",
+          replacement = "\\1"
+        )
+      ),
+      error = NA_integer_
+    )
+    return(date_published)
+  }
+  extract_salary <- function(item) {
+    salary <- unlist(item$salary)
     if (!is.null(salary)) {
       salary <- as_tibble(t(salary))
     } else {
-      salary <- tibble(
-        salary_type = NA_character_,
-        salary_period = NA_character_,
-        salary_max = NA_character_, # NA_integer_
-        salary_min = NA_character_, # NA_integer_
-        salary_currency = NA_character_
+      salary <- as_tibble(
+        t(sapply(
+          c(
+            "salary_period",
+            "salary_currency",
+            "salary_max",
+            "salary_min",
+            "salary_type"
+          ),
+          function(x) NA_character_
+        ))
       )
     }
-    salary
-  })
-  salaries <- do.call(bind_rows, salaries)
-  # reforming complete vacancy data frame
-  vacancies <- map_df(jobs, ~{
-    .x[["salary"]] <- NULL
-    vacancy <- as_tibble(t(unlist(.x)), .name_repair = 'unique')
-    vacancy <- clean_names(vacancy)
-  })
-  vacancies <- bind_cols(vacancies, salaries)
-  vacancies <- vacancies %>%
-    mutate(
-      job_url = paste0("https://glints.com/id/opportunities/jobs/", .$job_id),
-      source = paste("Glints", str_to_title(str_replace(source, "_", " "))),
-      job_title = str_squish(job_title),
-      is_remote = as.logical(is_remote),
-      posted_at = ymd(str_replace(posted_at, "^(\\d{4}-\\d{2}-\\d{2}).+$", "\\1"))
-    ) %>%
-    select(
-      "job_title",
-      company = company_name,
-      city = city_name,
-      country = country_name,
-      "is_remote",
-      category = category_name,
-      "salary_currency",
-      "salary_min",
-      "salary_max",
-      "salary_period",
-      "salary_type",
-      matches("employ"),
-      "posted_at",
-      "source",
-      "job_url",
-      "job_id"
+    return(salary)
+  }
+  extract_source <- function(item) {
+    return(
+      paste(
+        "Glints",
+        str_replace(item$source, "_", " ") %>%
+          str_to_title()
+      )
     )
-  #vacancies$posted_at <- ymd(
-  #  str_replace(vacancies$posted_at, "^(\\d{4}-\\d{2}-\\d{2}).+$", "\\1")
-  #)
-  #attributes(vacancies$posted_at)$tzone <- "Asia/Jakarta"
-  message("Done")
+  }
+  extract_joburl <- function(item) {
+    paste0("https://glints.com/id/opportunities/jobs/", item$job_id)
+  }
+  construct <- function(item) {
+    bind_cols(
+      tibble(
+        job_title = extract_jobtitle(item),
+        job_id = extract_jobid(item),
+        is_remote = extract_remote(item),
+        company = extract_company(item),
+        category = extract_category(item),
+        posted_at = extract_date_published(item),
+        country = extract_country(item),
+        city = extract_city(item),
+        source = extract_source(item),
+        job_url = extract_joburl(item)
+      ),
+      extract_salary(item)
+    )
+  }
+  arrange_col <- function(df) {
+    return(
+      select(
+        df,
+        "job_title",
+        "company",
+        "city",
+        "country",
+        "is_remote",
+        "category",
+        "salary_currency",
+        "salary_min",
+        "salary_max",
+        "salary_period",
+        "salary_type",
+        # "employment_type",
+        "posted_at",
+        "source",
+        "job_url",
+        "job_id"
+      )
+    )
+  }
+  # GraphQL requests
+  url <- "https://glints.com/api/graphql"
+  opnam <- "searchJobs"
+  country <- "ID"
+  query <- paste(readLines("R/glints.gql"), collapse = "")
+  message(sprintf("Pulling job data from Glints %s...", country))
+  if (limit > 100) {
+    offset <- (seq(1, ceiling(limit / 100)) - 1) * 100
+    limit_x <- 100
+    var <- sapply(
+      offset,
+      function(x) {
+        generate_variable(
+          key = key,
+          country = country,
+          limit = limit_x,
+          offset = x
+        )
+      }
+    )
+  } else {
+    var <- generate_variable(key, country, limit, 0)
+  }
+  vacancies <- map_df(
+    var, function(x) {
+      jobs <- gql(query = query, var = x, opnam = opnam, url = url)
+      jobs <- jobs$search$jobs
+      vacancy <- map(jobs, function(x) construct(x))
+      vacancy <- do.call(bind_rows, vacancy)
+      vacancy <- arrange_col(vacancy)
+      return(vacancy)
+    }
+  )
+  vacancies <- vacancies[1:limit, ]
   return(vacancies)
-
 }

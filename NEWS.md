@@ -1,3 +1,9 @@
+# unmplymnt 0.1.3
+
+* Code refactoring for more functional-based (the structure of dataframe may change).
+* Fix [#2](https://github.com/akherlan/unmplymnt/issues/2) to manage limitation in number of `glints()` result.
+* Reduce some fields from `glints()` result, update `fields_available`.
+
 # unmplymnt 0.1.2
 
 * Added `kalibrr()` function.

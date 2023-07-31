@@ -1,9 +1,9 @@
 #' Kalibrr Vacancy
 #'
 #' @description Get job vacancy from Kalibbr ID website.
-#' @param key A character indicate the keyword for job search.
-#' @param limit Limit amount of job results to return.
-#' @param remote Remote work allowance.
+#' @param key Characters indicate the keyword for job search
+#' @param limit Number of limit for job results
+#' @param remote Remote work allowance
 #'
 #' @examples
 #' \dontrun{
@@ -24,7 +24,9 @@ kalibrr <- function(key, limit = 30L, remote = FALSE) {
     key <- "data analyst"
     message(sprintf('Argument "key" is missing, using default: "%s"', key))
   }
-  if (missing(remote)) { remote <- FALSE }
+  if (missing(remote)) {
+    remote <- FALSE
+  }
 
   country <- "Indonesia"
 
@@ -37,11 +39,11 @@ kalibrr <- function(key, limit = 30L, remote = FALSE) {
     # https://www.kalibrr.com/job-board/te/data-engineer/co/Indonesia/work_from_home/y/1?sort=Freshness
 
     key <- gsub("\\s", "-", key)
-    n_page <- ceiling(limit/15)
+    n_page <- ceiling(limit / 15)
     if (remote) {
-      co = sprintf("%s/work_from_home/y/%s?sort=Relevance", country, 1:n_page)
+      co <- sprintf("%s/work_from_home/y/%s?sort=Relevance", country, 1:n_page)
     } else {
-      co = sprintf("%s/%s?sort=Relevance", country, 1:n_page)
+      co <- sprintf("%s/%s?sort=Relevance", country, 1:n_page)
     }
     url <- sprintf("https://www.kalibrr.com/job-board/te/%s/co/%s", key, co)
     return(url)
@@ -88,7 +90,7 @@ kalibrr <- function(key, limit = 30L, remote = FALSE) {
 
   get_date <- function(card) {
     card %>%
-      html_element('.k-block.k-mb-1') %>%
+      html_element(".k-block.k-mb-1") %>%
       html_text()
   }
 
@@ -140,7 +142,8 @@ kalibrr <- function(key, limit = 30L, remote = FALSE) {
   scrape_kalibrr <- function(url) {
     response <- read_html(url)
     cards <- html_elements(response, ".k-border-tertiary-ghost-color")
-    i <- 0; data <- list()
+    i <- 0
+    data <- list()
     for (card in cards) {
       i <- i + 1
       job_date <- get_date(card) %>% parse_date()
@@ -164,8 +167,6 @@ kalibrr <- function(key, limit = 30L, remote = FALSE) {
   urls <- generate_url(key = key, limit = limit, remote = remote)
   message(sprintf("Pulling job data from Kalibrr %s...", country))
   data <- lapply(urls, scrape_kalibrr)
-  message("Building a data.frame...")
-  data <- as_tibble(do.call(rbind, data))[1:limit,]
-  message("Done")
+  data <- as_tibble(do.call(rbind, data))[1:limit, ]
   return(data)
 }

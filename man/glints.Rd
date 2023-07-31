@@ -7,9 +7,9 @@
 glints(key, limit = 30L)
 }
 \arguments{
-\item{key}{A character indicate the keyword for job search.}
+\item{key}{Characters indicate the keyword for job search}
 
-\item{limit}{Limit amount of job results to return. Maximum 100.}
+\item{limit}{Number of limit for job results}
 }
 \description{
 Get job vacancy from Glints' website.

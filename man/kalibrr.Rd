@@ -7,11 +7,11 @@
 kalibrr(key, limit = 30L, remote = FALSE)
 }
 \arguments{
-\item{key}{A character indicate the keyword for job search.}
+\item{key}{Characters indicate the keyword for job search}
 
-\item{limit}{Limit amount of job results to return.}
+\item{limit}{Number of limit for job results}
 
-\item{remote}{Remote work allowance.}
+\item{remote}{Remote work allowance}
 }
 \description{
 Get job vacancy from Kalibbr ID website.

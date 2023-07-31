@@ -9,66 +9,89 @@
 #' @importFrom janitor clean_names
 #' @importFrom lubridate ymd
 #'
-restruct_job <- function(jobs){
-
-  # restructure
-  for (i in seq_along(jobs)) {
-    v <- unlist(jobs[[i]])
-    v <- cbind(name = names(v), value = v)
-    v <- as_tibble(v) %>% mutate(num = i)
-    if(i == 1){
-      vacancy <- v
-    } else {
-      vacancy <- bind_rows(vacancy, v)
-    }
+restruct_job <- function(jobs) {
+  extract_jobid <- function(item) {
+    return(item[["job_id"]])
   }
-
-  # reform
-  vacancy <- vacancy %>%
-    group_by(num, name) %>%
-    summarise_all(~toString(value)) %>%
-    ungroup() %>%
-    pivot_wider(
-      id_cols = "num",
-      names_from = "name",
-      values_from = "value"
-    ) %>%
-    select(-num) %>%
-    clean_names()
-
-  # arrange
-  if (nchar(vacancy$job_id[1]) == 7) { # jobstreet
-
-    vacancy <- vacancy %>%
-      mutate(job_url = paste0("https://www.jobstreet.co.id/id/job/", job_id),
-             source = "Jobstreet",
-             country = "Indonesia",
-             is_remote = NA,
-             posted_at = ymd(str_replace(posted_at, "^(\\d{4}-\\d{2}-\\d{2}).+$", "\\1"))) %>%
-      select(
-        "job_title",
-        "company" = "company_name",
-        "city" = "city_name",
-        "country",
-        "is_remote",
-        "category" = "category_name",
-        "salary_currency",
-        "salary_min",
-        "salary_max",
-        "salary_period",
-        matches("employ"),
-        "posted_at",
-        "source",
-        "job_url",
-        "job_id"
+  extract_jobtitle <- function(item) {
+    return(str_squish(item[["job_title"]]))
+  }
+  extract_item <- function(item, elem, name) {
+    return(item[[elem]][[name]])
+  }
+  extract_items <- function(item, elem, name) {
+    elements <- tryCatch(
+      list(
+        sapply(item[[elem]], function(x) {
+          x[[name]]
+        })
+      ),
+      error = list()
+    )
+    return(elements)
+  }
+  extract_joburl <- function(item) {
+    baseurl <- "https://www.jobstreet.co.id/id/job/"
+    return(paste0(baseurl, item[["job_id"]]))
+  }
+  extract_date_published <- function(item) {
+    date_published <- tryCatch(
+      ymd(
+        str_replace(
+          string = item[["posted_at"]],
+          pattern = "^(\\d{4}-\\d{2}-\\d{2}).+$",
+          replacement = "\\1"
+        )
+      ),
+      error = NA_integer_
+    )
+    return(date_published)
+  }
+  construct <- function(item) {
+    return(
+      tibble(
+        job_id = extract_jobid(item),
+        job_title = extract_jobtitle(item),
+        company = extract_item(item, "company", "name"),
+        salary_max = extract_item(item, "salary", "max"),
+        salary_min = extract_item(item, "salary", "min"),
+        salary_currency = extract_item(item, "salary", "currency"),
+        salary_period = extract_item(item, "salary", "period"),
+        category = extract_items(item, "category", "name"),
+        employment_type = extract_items(item, "employment", "type"),
+        city = extract_items(item, "city", "name"),
+        posted_at = extract_date_published(item),
+        job_url = extract_joburl(item),
+        source = "Jobstreet",
+        country = "Indonesia",
+        is_remote = NA,
       )
-
-  } else {
-
-    message("Something wrong")
-
+    )
+  }
+  arrange_col <- function(df) {
+    select(
+      df,
+      "job_title",
+      "company",
+      "city",
+      "country",
+      "is_remote",
+      "category",
+      "salary_currency",
+      "salary_min",
+      "salary_max",
+      "salary_period",
+      "employment_type",
+      "posted_at",
+      "source",
+      "job_url",
+      "job_id"
+    )
   }
 
-  return(vacancy)
+  vacancies <- map(jobs, function(x) construct(x))
+  vacancies <- do.call(bind_rows, vacancies)
+  vacancies <- arrange_col(vacancies)
+  return(vacancies)
 
 }

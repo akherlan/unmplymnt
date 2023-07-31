@@ -7,9 +7,9 @@
 jobstreet(key, limit = 30L)
 }
 \arguments{
-\item{key}{(character) Keyword for the jobs}
+\item{key}{Characters indicate the keyword for job search}
 
-\item{limit}{(numeric) Limit amount of job results}
+\item{limit}{Number of limit for job results}
 }
 \description{
 Get job vacancy from Jobstreet's website (Seek ID).
