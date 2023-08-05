@@ -6,7 +6,7 @@
 #'
 #' @import dplyr
 #' @importFrom tidyr pivot_wider
-#' @importFrom janitor clean_names
+#' @importFrom stringr str_squish
 #' @importFrom lubridate ymd
 #'
 restruct_job <- function(jobs) {
@@ -26,9 +26,11 @@ restruct_job <- function(jobs) {
           x[[name]]
         })
       ),
-      error = list()
+      error = list(NA_character_)
     )
-    return(elements)
+    return(sapply(elements, function(x) {
+      str_squish(paste(x, collapse = ", "))
+    }))
   }
   extract_joburl <- function(item) {
     baseurl <- "https://www.jobstreet.co.id/id/job/"

@@ -1,7 +1,7 @@
 Package: unmplymnt
 Type: Package
 Title: Looking for Job Opportunity
-Version: 0.1.3.1
+Version: 0.0.0.9000
 Authors@R: c(
   person(given = "Andi", 
          family = "Herlan",
@@ -20,7 +20,6 @@ Imports:
     jsonlite,
     dplyr,
     tidyr,
-    janitor,
     stringr,
     rvest,
     purrr,

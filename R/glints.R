@@ -19,10 +19,7 @@
 
 
 glints <- function(key, limit = 30L) {
-  if (missing(key)) {
-    key <- "data analyst"
-    message(sprintf('Argument "key" is missing, using default: "%s"', key))
-  }
+  if (missing(key)) key <- set_default_key("data analyst")
   generate_variable <- function(key, country, limit, offset) {
     vardata <- toJSON(
       list(
