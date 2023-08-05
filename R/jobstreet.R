@@ -16,12 +16,7 @@
 #' @export
 #'
 jobstreet <- function(key, limit = 30L) {
-
-  if (missing(key)) {
-    key <- "data analyst"
-    message(sprintf('Argument "key" is missing, using default: "%s"', key))
-  }
-
+  if (missing(key)) key <- set_default_key("data analyst")
   page <- seq(1L, ceiling(limit / 30L), 1L)
   country <- "id"
   url <- sprintf(
@@ -31,37 +26,40 @@ jobstreet <- function(key, limit = 30L) {
     ),
     country
   )
-
-  var <- sapply(page, function(p) {
-    toJSON(list(keyword = key,
-                jobFunctions = list(),
-                locations = list(),
-                salaryType = 1,
-                jobTypes = list(),
-                careerLevels = list(),
-                page = p,
-                country = country,
-                categories = list(),
-                workTypes = list(),
-                industries = list(),
-                locale = "id"),
-           auto_unbox = TRUE)
-  })
-
+  set_variables <- function(page) {
+    toJSON(
+      list(keyword = key,
+           jobFunctions = list(),
+           locations = list(),
+           salaryType = 1,
+           jobTypes = list(),
+           careerLevels = list(),
+           page = page,
+           country = country,
+           categories = list(),
+           workTypes = list(),
+           industries = list(),
+           locale = "id"
+      ),
+      auto_unbox = TRUE
+    )
+  }
+  var <- sapply(page, function(p) set_variables(p))
   querypath <- list.files(
     system.file("extdata/graphql", package = "unmplymnt"),
     pattern = "jobstreet",
     full.names = TRUE
   )
   query <- paste(readLines(querypath), collapse = "")
-
-  message(sprintf("Pulling job data from Jobstreet (Seek %s)...",
-                  toupper(country)))
-
+  message(
+    sprintf(
+      "Pulling job data from Jobstreet (Seek %s)...",
+      toupper(country)
+    )
+  )
   jobs <- map(var, function(x) gql(query = query, var = x, url = url))
   jobs <- map(jobs, function(x) x$jobs$jobs)
   vacancy <- map_df(jobs, function(x) restruct_job(x))
   vacancy <- distinct(vacancy)[1:limit, ]
-
   return(vacancy)
 }
